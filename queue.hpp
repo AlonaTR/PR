@@ -25,9 +25,11 @@ bool is_empty(struct Queue *queue);
 void print_queue(struct Queue *queue);
 // stwórz nową część kolejki
 struct part* create_part(int ts, int src_id, int cuchy);
+// dodaje element według etykiety czasowej
+void add_by_time(struct Queue *queue, int ts, int src_id, int cuchy);
+// zwraca indeks elemntu w kolejce według id procesu
+int find_by_src(struct Queue *queue, int src_id);
 
-// dodaje element według etykiety czasowej lub jeżeli są równe to według id procesu
-void push_by_time(struct Queue *queue, int ts, int src_id, int cuchy);
 // zdejmuje element według id procesu
 void pop_by_src(struct Queue *queue, int src_id);
 // zwraca pierwszy element w kolejce
@@ -36,7 +38,6 @@ struct part* front(struct Queue *queue);
 struct part* get_by_id(struct Queue *queue, int i);
 // zwraca wybrany element w kolejce według id procesu
 struct part* get_by_src(struct Queue *queue, int src_id);
-// zwraca indeks elemntu w kolejce według id procesu
-int find_by_src(struct Queue *queue, int src_id);
+
 
 #endif

@@ -11,8 +11,8 @@
 
 #include "queue.hpp"
 
-#ifndef GLOBALH
-#define GLOBALH
+#ifndef GLOBALHPP
+#define GLOBALHPP
 #define _GNU_SOURCE
 
 /* używane w wątku głównym,
@@ -109,11 +109,9 @@ extern MPI_Datatype MPI_PAKIET_T;
 /* printf ale z kolorkami i automatycznym wyświetlaniem RANK. Patrz debug wyżej po szczegóły, jak działa ustawianie kolorków */
 #define println(FORMAT, ...) printf("%c[%d;%dm [%d]: %d " FORMAT "%c[%d;%dm\n",  27, (1+(rank_comm/7))%2, 31+(6+rank_comm)%7, rank_comm, timer, ##__VA_ARGS__, 27,0,37);
 
-// void sendPacket(packet_t *pkt, int destination, int tag);
-void changeState( state_t );
-void sendPacket(packet_t *pkt, int destination, int tag);
-#endif
-
+void change_state(state_t);
+void send_packet(packet_t *packet, int destination, int tag);
 void init_MPI(int argc, char** argv);
 void finalize();
 void init_program_vars(int argc, char** argv);
+#endif
