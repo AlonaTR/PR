@@ -14,7 +14,7 @@ int ACK_got = 0;
 
 bool ubiegam_sie = false;
 bool wyzerowanie_kolejki = false;   // nwm czy potrzebne
-bool policono_X = false;
+bool counted_X = false;
 int ptn_num_w_kolejce_policzony = -1;
 
 struct Queue *queue;
@@ -39,10 +39,8 @@ int main(int argc, char **argv) {
 
     init_MPI(argc, argv);
     init_program_vars(argc, argv);
-    int processes;
-    int rank;
-    MPI_Comm_size(MPI_COMM_WORLD, &processes);
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    
+    mainLoop();
     
     finalize();
     return 0;
@@ -80,7 +78,6 @@ void init_MPI(int argc, char** argv) {
         MPI_Finalize();
         exit(-1);
     }
-
 
     /* Stworzenie typu */
     /* Poniższe (aż do MPI_Type_commit) potrzebne tylko, jeżeli
@@ -129,7 +126,7 @@ void send_packet(packet_t *packet, int destination, int tag) {
     packet->ts = timer;
     packet->cuchy = my_cuchy;
     packet->src_id = rank_comm;
-    MPI_Send(packet, 1, MPI_PAKIET_T, destination, tag, timer);
+    MPI_Send(packet, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
 
     switch(tag) {
         case REQUEST:

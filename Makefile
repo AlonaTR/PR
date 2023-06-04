@@ -2,8 +2,8 @@ SOURCES=$(wildcard *.cpp)
 HEADERS=$(SOURCES:.c=.hpp)
 FLAGS=-DDEBUG -g
 
-S=2
 N=5
+stanowiska=2
 M=10
 X=20
 
@@ -18,4 +18,4 @@ clean:
 	rm main a.out
 
 run: main
-	mpirun -n $(N) ./main $(S) $(M) $(X)
+	mpirun -n $(N) ./main $(stanowiska) $(M) $(X)

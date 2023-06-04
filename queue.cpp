@@ -64,5 +64,51 @@ void add_by_time(struct Queue *queue, int ts, int src_id, int cuchy) {
 }
 
 int find_by_src(struct Queue *queue, int src_id) {
-    
+    struct part *head = queue->head;
+    if (is_empty(queue)) {
+        debug("!!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!!", src_id);
+        exit(-1);
+    }
+    int i = 0;
+    while ((head->next) && (head->src_id != src_id)) {
+        head = head->next;
+        i++;
+    }
+    if (head->src_id != src_id) {
+        debug("!!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!!", src_id);
+        exit(-1);
+    }
+    return i;
+}
+
+void pop_by_src(struct Queue *queue, int src_id) {
+    struct part *head = queue->head;
+    if(is_empty(queue)) {
+        debug("!!! Próba pobrania żądanie według id procesu %d na pustej kolejce !!!", src_id);
+        return;
+    }
+    while(head && head->src_id != src_id) {
+        head = head->next;
+    }
+    if (!head) {
+        debug("!!! Próba usunięcia z kolejki nieistniejącego id procesu %d !!!", src_id);
+        return;
+    }
+    // first element
+    if (! head->prev) queue->head = head->next;
+    else head->prev->next = head->next;
+    if (head->next) head->next->prev = head->prev;
+    queue->size--;
+}
+
+struct part* get_by_id(struct Queue *queue, int i) {
+    struct part *head = queue->head;
+    if(is_empty(queue)) {
+        debug("!!! Próba pobrania żądanie według pozycji %d na pustej kolejce !!!", i);
+        return nullptr;
+    }
+    while(head && --i >= 0) {
+        head = head->next;
+    }
+    return head;
 }

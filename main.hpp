@@ -18,26 +18,26 @@
 /* używane w wątku głównym,
  determinuje jak często i na jak długo zmieniają się stany */
 #define STATE_CHANGE_PROB 50
-#define MAX_SEC_IN_LOBBY 1
-#define MAX_SEC_IN_ROOM 1
-#define MAX_CUCH_INCREASE 1
+#define MAX_SEC_IN_LOBBY 5
+#define MAX_SEC_IN_ROOM 7
+#define MAX_CUCH_INCREASE 5
 
 #define ROOT 0
 
 typedef enum {InLobby, InQueue, InRoom, InFinish} state_t;
 
-extern int shower_stand_num;
-extern int num_otaku;
-extern int M;
-extern int X;
-extern int my_cuchy;
-extern int current_x;
-extern int ACK_got;
+extern int shower_stand_num;    /* liczba stanowisk */
+extern int num_otaku;   /* liczba otaku */
+extern int M;   /* dopuszczalna liczba cuchów w pomieszczeniu */
+extern int X;   /* max cuchów do wymiany przewodniczącego */
+extern int my_cuchy;    /* moja wartość cuchów */
+extern int current_x;   /* aktualna ilosc cuchow*/
+extern int ACK_got;    /* liczba ACk otrzymana od innych procesów */
 
-extern bool ubiegam_sie;
-extern bool wyzerowanie_kolejki;
-extern bool policono_X;
-extern int ptn_num_w_kolejce_policzony;
+extern bool ubiegam_sie; /* czy chcę dostępu do kolejki */
+extern bool wyzerowanie_kolejki;    /* czy czekać na opróżnienie kolejki */
+extern bool counted_X; /* czy limit cuchów uaktualniony */
+extern int ptn_num_w_kolejce_policzony;    /* pozycja na której zokończono liczenie cuchó */
 
 extern struct Queue *queue;
 
