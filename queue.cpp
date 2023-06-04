@@ -12,9 +12,13 @@ bool is_empty(struct Queue *queue) {
 }
 
 void print_queue(struct Queue *queue) {
+    debug("--- kolejka ---");
+    if (is_empty(queue)) { 
+        debug("--- kolejka pusta ---");
+        return;
+    }
+    
     struct part* element = queue->head;
-    debug("kolejka");
-    if (is_empty(queue)) return;
     while (element) {
         debug(" id:%d | ts:%-5d | c:%d ", element->src_id, element->ts, element->cuchy);
         element = element->next;

@@ -21,23 +21,27 @@ void *startKomWatek(void *ptr) {
                 break;
                 }
             case ACK: {
-                debug("Dostałem ACK od %d",pakiet.src_id);
+                debug("Dostałem ACK od %d z zegarem:%d", pakiet.src_id, pakiet.ts);
                 ACK_got++;
                 if (ACK_got == num_otaku) try_to_enter();
                 break;
                 }
             case REQUEST: {
-                debug("Dostałem REQUEST od %d z cuchami %d",pakiet.src_id, pakiet.cuchy)
+                debug("Dostałem REQUEST od %d z zegarem:%d i cuchami:%d", pakiet.src_id, pakiet.ts, pakiet.cuchy);
                 add_by_time(queue, pakiet.ts, pakiet.src_id, pakiet.cuchy);
                 print_queue(queue);
 
                 pthread_mutex_lock(&timerMut);
                 send_packet(0, pakiet.src_id, ACK);
                 pthread_mutex_unlock(&timerMut);
+
+                if(pakiet.src_id == rank_comm) {
+                    ubiegam_sie = true;
+                }
                 break;
                 }
             case RELEASE: {
-                debug("Dostałem RELEASE od %d", pakiet.src_id);
+                debug("Dostałem RELEASE od %d z zegarem:%d", pakiet.src_id, pakiet.ts);
                 int pos = find_by_src(queue, pakiet.src_id);
                 if (ptn_num_w_kolejce_policzony < pos) {
                     update_cuchy(pos);
@@ -52,6 +56,12 @@ void *startKomWatek(void *ptr) {
                     my_cuchy += rand() % MAX_CUCH_INCREASE + 1;
                     pthread_mutex_unlock(&leaveRoomMut);
                 }
+                break;
+                }
+            case NOACK: {
+                debug("Dostałem NOACK od %d z zegarem:%d", pakiet.src_id, pakiet.ts);
+                NO_ACK_got++;
+                if (ACK_got == num_otaku) try_to_enter();
                 break;
                 }
         }

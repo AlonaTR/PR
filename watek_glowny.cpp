@@ -4,14 +4,14 @@
 
 void mainLoop() {
     bool printed = false;
-    // srand(time(NULL) + rank_comm);
+    srand(time(NULL) + rank_comm);
     while (stan != InFinish) {
         int perc = random()%100; 
         // try to enter with some probability
         if (perc < STATE_CHANGE_PROB) {
             switch(stan) {
                 case InLobby:
-                // wyślij REQUEST o wejście do pokoju
+                /* wyślij REQUEST o wejście do pokoju */
                     if (my_cuchy > M) {
                         if(!printed) {
                             printed = true;
@@ -31,21 +31,28 @@ void mainLoop() {
                     pthread_mutex_lock( &roomMut );
                     break;
                 case InQueue:
-                // czekanie na wejście do pokoju (mutex w wątku komunikacyjnym)
+                /* czekanie na wejście do pokoju (mutex w wątku komunikacyjnym) */
                     debug("Czekam na wejście do pokoju");
                     pthread_mutex_lock( &roomMut );
                     pthread_mutex_lock( &leaveRoomMut );
                     change_state( InRoom );
                     debug("Zmieniam stan na \"Jestem w pokoju\"");
+                    sleep(rand()% MAX_SEC_IN_ROOM + 1); //spędza minimalny czas w pokoju
                     break;
                 case InRoom:
-                // jestem w pokoju
+                /*jestem w pokoju */
+                    debug("Chcę wyjść z pokoju");
                     pthread_mutex_lock(&timerMut);
                     for (int i=0; i<size_comm; i++) send_packet(0, i, RELEASE);
                     pthread_mutex_unlock(&timerMut);
                     pthread_mutex_unlock(&roomMut);
                     pthread_mutex_lock(&leaveRoomMut);
                     change_state(InLobby);
+
+                    // TODO: send ACK to everyone in queue
+
+                    ACK_got = 0;
+                    NO_ACK_got = 0;
                     debug("Wyszedłem z pokoju");
                     break;
                 default:

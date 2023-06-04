@@ -34,10 +34,10 @@ void pop_by_src(struct Queue *queue, int src_id);
 // zwraca wybrany element w kolejce według pozycji
 struct part* get_by_id(struct Queue *queue, int i);
 
-// zwraca pierwszy element w kolejce
-struct part* front(struct Queue *queue);
-// zwraca wybrany element w kolejce według id procesu
-struct part* get_by_src(struct Queue *queue, int src_id);
+// // zwraca pierwszy element w kolejce
+// struct part* front(struct Queue *queue);
+// // zwraca wybrany element w kolejce według id procesu
+// struct part* get_by_src(struct Queue *queue, int src_id);
 
 
 #endif

@@ -11,6 +11,7 @@ int X;
 int my_cuchy;
 int current_x = 0;
 int ACK_got = 0;
+int NO_ACK_got = 0;
 
 bool ubiegam_sie = false;
 bool wyzerowanie_kolejki = false;   // nwm czy potrzebne
@@ -23,7 +24,7 @@ struct Queue *queue;
 state_t stan = InLobby;
 int size_comm, rank_comm, timer = 0;
 MPI_Datatype MPI_PAKIET_T;
-pthread_t threadKom, threadMon;
+pthread_t threadKom;
 
 pthread_mutex_t stateMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t timerMut = PTHREAD_MUTEX_INITIALIZER;
@@ -53,8 +54,10 @@ void init_program_vars(int argc, char** argv) {
     X = atoi(argv[3]);
 
     num_otaku = size_comm;
+    srand (time(NULL));
     // in range 1 to X
-    my_cuchy = rand() % X + 1;
+    my_cuchy = rand() % M + 1;
+    queue = create_queue();
 
     pthread_create(&threadKom, nullptr, startKomWatek, 0);
     debug("jestem");
@@ -103,12 +106,16 @@ void init_MPI(int argc, char** argv) {
 
 
 void finalize() {
-    pthread_mutex_destroy( &stateMut);
     /* Czekamy, aż wątek potomny się zakończy */
     println("czekam na wątek \"komunikacyjny\"\n" );
     pthread_join(threadKom,NULL);
-    if (rank_comm == 0) pthread_join(threadMon,NULL);
+    if (rank_comm == 0) pthread_join(threadKom, NULL);
+    pthread_mutex_destroy( &stateMut);
+    pthread_mutex_destroy( &timerMut);
+    pthread_mutex_destroy( &roomMut);
+    pthread_mutex_destroy( &leaveRoomMut);
     MPI_Type_free(&MPI_PAKIET_T);
+    delete queue;
     MPI_Finalize();
 }
 
@@ -116,7 +123,6 @@ void finalize() {
 void send_packet(packet_t *packet, int destination, int tag) {
     bool packet_created = false;
     
-    // packet=0 ->wysłanie ACK
     if (packet == 0) {
         packet = new packet_t();
         packet_created = true;

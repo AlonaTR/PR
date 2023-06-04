@@ -33,6 +33,7 @@ extern int X;   /* max cuchów do wymiany przewodniczącego */
 extern int my_cuchy;    /* moja wartość cuchów */
 extern int current_x;   /* aktualna ilosc cuchow*/
 extern int ACK_got;    /* liczba ACk otrzymana od innych procesów */
+extern int NO_ACK_got;    /* liczba NOACK otrzymana od innych procesów */
 
 extern bool ubiegam_sie; /* czy chcę dostępu do kolejki */
 extern bool wyzerowanie_kolejki;    /* czy czekać na opróżnienie kolejki */
@@ -71,6 +72,7 @@ extern MPI_Datatype MPI_PAKIET_T;
 #define REQUEST 2
 #define RELEASE 3
 #define ACK 4
+#define NOACK 5
 
 /* macro debug - działa jak printf, kiedy zdefiniowano
    DEBUG, kiedy DEBUG niezdefiniowane działa jak instrukcja pusta 
