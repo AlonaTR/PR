@@ -2,10 +2,10 @@ SOURCES=$(wildcard *.cpp)
 HEADERS=$(SOURCES:.c=.hpp)
 FLAGS=-DDEBUG -g
 
-N=10
-stanowiska=7
-M=20
-X=50
+N=5
+stanowiska=2
+M=10
+X=25
 
 all: main
 

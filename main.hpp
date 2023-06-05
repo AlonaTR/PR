@@ -31,7 +31,6 @@ extern int X;   /* max cuchów do wymiany przewodniczącego */
 extern int my_cuchy;    /* moja wartość cuchów */
 extern int current_x;   /* aktualna ilosc cuchow*/
 extern int ACK_got;    /* liczba ACk otrzymana od innych procesów */
-extern int NO_ACK_got;    /* liczba NOACK otrzymana od innych procesów */
 
 extern bool ubiegam_sie; /* czy chcę dostępu do kolejki */
 extern bool wyzerowanie_kolejki;    /* czy opróżnienić kolejke */
@@ -54,9 +53,6 @@ extern pthread_mutex_t stateMut;
 extern pthread_mutex_t timerMut;
 extern pthread_mutex_t roomMut;
 extern pthread_mutex_t leaveRoomMut;
-
-/* stan globalny wykryty przez monitor */
-extern int globalState;
 
 #define FIELDNO 3
 typedef struct {

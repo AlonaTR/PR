@@ -38,7 +38,7 @@ void mainLoop() {
                     pthread_mutex_lock( &leaveRoomMut );
                     change_state( InRoom );
                     debug("Zmieniam stan na \"Jestem w pokoju\"");
-                    sleep(rand()% MAX_SEC_IN_ROOM + 1); //spędza minimalny czas w pokoju
+                    sleep(rand()% MAX_SEC_IN_ROOM + 1); //spędza czas w pokoju
                     break;
                 case InRoom:
                 /*jestem w pokoju */
@@ -54,8 +54,8 @@ void mainLoop() {
                     // TODO: send ACK to everyone in queue
 
                     ACK_got = 0;
-                    NO_ACK_got = 0;
                     println("Wyszedłem z pokoju");
+                    printed = false;
                     break;
                 default:
                     break;
