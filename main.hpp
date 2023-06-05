@@ -24,8 +24,6 @@
 
 #define ROOT 0
 
-typedef enum {InLobby, InQueue, InRoom, InFinish} state_t;
-
 extern int shower_stand_num;    /* liczba stanowisk */
 extern int num_otaku;   /* liczba otaku */
 extern int M;   /* dopuszczalna liczba cuchów w pomieszczeniu */
@@ -36,12 +34,14 @@ extern int ACK_got;    /* liczba ACk otrzymana od innych procesów */
 extern int NO_ACK_got;    /* liczba NOACK otrzymana od innych procesów */
 
 extern bool ubiegam_sie; /* czy chcę dostępu do kolejki */
-extern bool wyzerowanie_kolejki;    /* czy czekać na opróżnienie kolejki */
+extern bool wyzerowanie_kolejki;    /* czy opróżnienić kolejke */
 extern bool counted_X; /* czy limit cuchów uaktualniony */
-extern int ptn_num_w_kolejce_policzony;    /* pozycja na której zokończono liczenie cuchó */
+
+extern int ptn_num_w_kolejce_policzony;    /* wskaźnik-pozycja na której zokończono liczenie cuchó */
 
 extern struct Queue *queue;
 
+typedef enum {InLobby, InQueue, InRoom, InFinish} state_t;
 /* programme part */
 extern state_t stan;
 extern int size_comm;
@@ -49,7 +49,6 @@ extern int rank_comm;
 extern int timer;
 extern MPI_Datatype MPI_PAKIET_T;
 extern pthread_t threadKom;
-extern pthread_t threadMon;
 
 extern pthread_mutex_t stateMut;
 extern pthread_mutex_t timerMut;
@@ -72,7 +71,6 @@ extern MPI_Datatype MPI_PAKIET_T;
 #define REQUEST 2
 #define RELEASE 3
 #define ACK 4
-#define NOACK 5
 
 /* macro debug - działa jak printf, kiedy zdefiniowano
    DEBUG, kiedy DEBUG niezdefiniowane działa jak instrukcja pusta 

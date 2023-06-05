@@ -1,5 +1,7 @@
-#ifndef WATEK_GLOWNY_H
-#define WATEK_GLOWNY_H
+#ifndef WATEK_GLOWNY_HPP
+#define WATEK_GLOWNY_HPP
+
+#include <iostream>
 
 /* pętla główna aplikacji: zmiany stanów itd */
 void mainLoop();

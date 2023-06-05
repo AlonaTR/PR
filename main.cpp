@@ -14,7 +14,7 @@ int ACK_got = 0;
 int NO_ACK_got = 0;
 
 bool ubiegam_sie = false;
-bool wyzerowanie_kolejki = false;   // nwm czy potrzebne
+bool wyzerowanie_kolejki = false;
 bool counted_X = false;
 int ptn_num_w_kolejce_policzony = -1;
 
@@ -30,6 +30,7 @@ pthread_mutex_t stateMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t timerMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t roomMut = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t leaveRoomMut = PTHREAD_MUTEX_INITIALIZER;
+
 
 
 int main(int argc, char **argv) {
@@ -54,7 +55,7 @@ void init_program_vars(int argc, char** argv) {
     X = atoi(argv[3]);
 
     num_otaku = size_comm;
-    srand (time(NULL));
+    srand (rank_comm);
     // in range 1 to X
     my_cuchy = rand() % M + 1;
     queue = create_queue();
@@ -128,7 +129,7 @@ void send_packet(packet_t *packet, int destination, int tag) {
         packet_created = true;
     }
 
-    timer++;
+    // timer++;
     packet->ts = timer;
     packet->cuchy = my_cuchy;
     packet->src_id = rank_comm;

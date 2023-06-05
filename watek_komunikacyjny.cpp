@@ -32,6 +32,7 @@ void *startKomWatek(void *ptr) {
                 print_queue(queue);
 
                 pthread_mutex_lock(&timerMut);
+                timer++;
                 send_packet(0, pakiet.src_id, ACK);
                 pthread_mutex_unlock(&timerMut);
 
@@ -41,8 +42,9 @@ void *startKomWatek(void *ptr) {
                 break;
                 }
             case RELEASE: {
-                debug("Dostałem RELEASE od %d z zegarem:%d", pakiet.src_id, pakiet.ts);
-                int pos = find_by_src(queue, pakiet.src_id);
+                int del_src = pakiet.src_id;
+                debug("Dostałem RELEASE od %d  %dz zegarem:%d", pakiet.src_id, del_src, pakiet.ts);
+                int pos = find_by_src(queue, del_src);
                 if (ptn_num_w_kolejce_policzony < pos) {
                     update_cuchy(pos);
                 }
@@ -53,72 +55,68 @@ void *startKomWatek(void *ptr) {
 
                 if (ubiegam_sie) try_to_enter();
                 else if (pakiet.src_id == rank_comm) {
-                    my_cuchy += rand() % MAX_CUCH_INCREASE + 1;
+                    // srand(rank_comm);
+                    my_cuchy = rand() % M + 1;
                     pthread_mutex_unlock(&leaveRoomMut);
                 }
                 break;
                 }
-            case NOACK: {
-                debug("Dostałem NOACK od %d z zegarem:%d", pakiet.src_id, pakiet.ts);
-                NO_ACK_got++;
-                if (ACK_got == num_otaku) try_to_enter();
-                break;
-                }
         }
-    }
+    } return nullptr;
 }
 
 
 void try_to_enter() {
+    if (! ubiegam_sie) return;
     debug(" --- Sprawdzanie możliwości wejścia do pokoju ---");
 
     // wszystkie ACK
     if (ACK_got < num_otaku) {
         debug("1. Otrzymane ACK (ACK:%d, aktualne:%d): NIE", num_otaku, ACK_got);
-        debug("---NIE ZEZWOLONO NA DOSTĘP---");
+        println("---NIE ZEZWOLONO NA DOSTĘP---");
         return;
     } else debug("1. Otrzymano wszystkie ACK: TAK");
 
     // istnieje wolne stanowisko
-    int moj_idx = find_by_src(queue, rank_comm);
+    int moj_idx = find_by_rank(queue);
     if (moj_idx+1 > shower_stand_num) {
         debug("2. Jest miejsce (S:%d, ja:%d): NIE", shower_stand_num, moj_idx + 1);
-        debug("---NIE ZEZWOLONO NA DOSTĘP---");
+        println("---NIE ZEZWOLONO NA DOSTĘP---");
         return;
     } else debug("2. Jest miejsce w pokoju: TAK");
     
     // my_cychy mieszczą się w limicie M
     int suma_cuchow = 0;
-    for (int i = 0; i < moj_idx; i++) {
+    for (int i = 0; i <= moj_idx; i++) {
         struct part* element = get_by_id(queue, i);
         suma_cuchow += element->cuchy;
         if (suma_cuchow > M) {
             debug("3. Cuchy w pomieszczeniu przekroczone (M:%d, aktualne:%d): NIE", M, suma_cuchow);
-            debug("---NIE ZEZWOLONO NA DOSTĘP---");
+            println("---NIE ZEZWOLONO NA DOSTĘP---");
             return;
         }
     } 
-    debug("3. Moje cuchy mieszczą się w pokoju: TAK");
+    debug("3. Moje cuchy mieszczą się w pokoju (M:%d, aktualne:%d): TAK", M, suma_cuchow);
     
     // nie trzeba wymieniać przestawiciela (X)
     if (wyzerowanie_kolejki) {
         if (ptn_num_w_kolejce_policzony > -1) {
             debug("4. Wyzerowano kolejkę: NIE");
-            debug("---NIE ZEZWOLONO NA DOSTĘP---");
+            println("---NIE ZEZWOLONO NA DOSTĘP---");
             return;
         } else debug("4. Wyzerowano kolejkę: TAK");
     } else if (! counted_X) {
-        update_cuchy(find_by_src(queue, rank_comm));
+        update_cuchy(find_by_rank(queue));
         if (wyzerowanie_kolejki) {
             if (ptn_num_w_kolejce_policzony > -1) {
                 debug("4. Wyzerowano kolejkę: NIE");
-                debug("---NIE ZEZWOLONO NA DOSTĘP---");
+                println("---NIE ZEZWOLONO NA DOSTĘP---");
                 return;
             } else debug("4. Wyzerowano kolejkę: TAK");
         }
     }
 
-    debug("--- ZEZWOLONO NA DOSTĘP ---");
+    println("--- ZEZWOLONO NA DOSTĘP ---");
     ACK_got = 0;
     ubiegam_sie = false;
     counted_X = false;
@@ -126,24 +124,24 @@ void try_to_enter() {
 }
 
 void update_cuchy(int pos) {
-    int my_idx = find_by_src(queue, rank_comm);
     while(ptn_num_w_kolejce_policzony < pos) {
         ptn_num_w_kolejce_policzony++;
         struct part *request = get_by_id(queue, ptn_num_w_kolejce_policzony);
         current_x += request->cuchy;
         if(current_x >= X) {
-            debug("Proces %d przepełnił X (X:%d, aktualny_X:%d): zerowanie X", request->src_id, X, current_x);
+            debug("!!! PROCES %d PRZEPEŁNIŁ X (X:%d, aktualny_X:%d): zerowanie X", request->src_id, X, current_x);
+            println("Przedstawiciel zemdlał przez proces: %d", request->src_id);
             current_x = 0;
-            if(ubiegam_sie && ptn_num_w_kolejce_policzony != my_idx) {
+            if(ubiegam_sie && ptn_num_w_kolejce_policzony != pos) {
                 wyzerowanie_kolejki = true;
             }
-            if(ubiegam_sie && ptn_num_w_kolejce_policzony >= my_idx) {
+            if(ubiegam_sie && ptn_num_w_kolejce_policzony >= pos) {
                 counted_X = true;
             }
             break;
         }
     }
-    if(ubiegam_sie && ptn_num_w_kolejce_policzony >= my_idx) {
+    if(ubiegam_sie && ptn_num_w_kolejce_policzony >= pos) {
         counted_X = true;
     }
     debug("KONTROLA X (X:%d, aktualny_X:%d)", X, current_x);

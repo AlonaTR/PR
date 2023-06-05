@@ -6,7 +6,7 @@ void mainLoop() {
     bool printed = false;
     srand(time(NULL) + rank_comm);
     while (stan != InFinish) {
-        int perc = random()%100; 
+        int perc = rand() % 100; 
         // try to enter with some probability
         if (perc < STATE_CHANGE_PROB) {
             switch(stan) {
@@ -24,6 +24,7 @@ void mainLoop() {
                     
                     pthread_mutex_lock( &timerMut );
                     debug("Zmieniam stan na \"Ubiegam się\"");
+                    timer++;
                     for (int i=0; i<size_comm; i++){
                         send_packet(0, i, REQUEST);
                     }
@@ -43,6 +44,7 @@ void mainLoop() {
                 /*jestem w pokoju */
                     debug("Chcę wyjść z pokoju");
                     pthread_mutex_lock(&timerMut);
+                    timer++;
                     for (int i=0; i<size_comm; i++) send_packet(0, i, RELEASE);
                     pthread_mutex_unlock(&timerMut);
                     pthread_mutex_unlock(&roomMut);
@@ -53,7 +55,7 @@ void mainLoop() {
 
                     ACK_got = 0;
                     NO_ACK_got = 0;
-                    debug("Wyszedłem z pokoju");
+                    println("Wyszedłem z pokoju");
                     break;
                 default:
                     break;
