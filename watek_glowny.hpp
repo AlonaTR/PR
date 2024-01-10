@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-/* pętla główna aplikacji: zmiany stanów itd */
+// pętla główna aplikacji: zmiany stanów itd 
 void mainLoop();
 
 #endif
