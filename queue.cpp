@@ -71,40 +71,38 @@ void add_by_time(struct Queue *queue, int timestamp, int src_id, int cuchy) {
     return;
 }
 
-int find_by_src(struct Queue *queue, int dupa) {
-    printf("%d find_by_src: %d \n",rank_comm, dupa);
+int find_by_src(struct Queue *queue, int source) {
+    printf("%d find_by_src: %d \n",rank_comm, source);
     struct part *head = queue->head;
     if (is_empty(queue)) {
-        printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, dupa);
+        printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, source);
         exit(-1);
     }
     int i = 0;
-    while ((head->next) && (head->src_id != dupa)) {
+    while ((head->next) && (head->src_id != source)) {
         head = head->next;
         i++;
     }
-    if (head->src_id != dupa) {
-        printf("%d !!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!! \n",rank_comm, dupa);
+    if (head->src_id != source) {
+        printf("%d !!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!! \n",rank_comm, source);
         exit(-1);
     }
     return i;
 }
 
 int find_by_rank(struct Queue *queue) {
-    int dupa = rank_comm;
-    printf("%d find_by_rank: %d",rank_comm, dupa);
     struct part *head = queue->head;
     if (is_empty(queue)) {
-        printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, dupa);
+        printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, rank_comm);
         exit(-1);
     }
     int i = 0;
-    while ((head->next) && (head->src_id != dupa)) {
+    while ((head->next) && (head->src_id != rank_comm)) {
         head = head->next;
         i++;
     }
-    if (head->src_id != dupa) {
-        printf("%d !!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!! \n",rank_comm, dupa);
+    if (head->src_id != rank_comm) {
+        printf("%d !!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!! \n",rank_comm, rank_comm);
         exit(-1);
     }
     return i;

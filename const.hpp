@@ -1,7 +1,7 @@
 /* Typy wiadomości */
-#define REQUEST 2
-#define RELEASE 3
-#define ACK 4
+#define REQUEST 1
+#define RELEASE 2
+#define ACK 3
 
 /* używane w wątku głównym,
  determinuje jak często i na jak długo zmieniają się stany */
