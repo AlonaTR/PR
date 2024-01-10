@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 struct part {
-    int ts, src_id, cuchy;
+    int timestamp, src_id, cuchy;
     struct part *prev=nullptr;
     struct part *next=nullptr;
 };
@@ -22,9 +22,9 @@ bool is_empty(struct Queue *queue);
 // wypisuje kolejkę
 void print_queue(struct Queue *queue);
 // stwórz nową część kolejki
-struct part* create_part(int ts, int src_id, int cuchy);
-// dodaje element według etykiety czasowej, sort(ts, id)
-void add_by_time(struct Queue *queue, int ts, int src_id, int cuchy);
+struct part* create_part(int timestamp, int src_id, int cuchy);
+// dodaje element według etykiety czasowej, sort(timestamp, id)
+void add_by_time(struct Queue *queue, int timestamp, int src_id, int cuchy);
 // zwraca indeks elemntu w kolejce według id procesu
 int find_by_src(struct Queue *queue, int dupa);
 int find_by_rank(struct Queue *queue);

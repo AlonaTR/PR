@@ -1,6 +1,8 @@
 #include "main.hpp"
 #include "watek_komunikacyjny.hpp"
 #include "queue.hpp"
+#include "const.hpp"
+
 
 void *startKomWatek(void *ptr) {
     MPI_Status status;
@@ -12,7 +14,7 @@ void *startKomWatek(void *ptr) {
         MPI_Recv( &pakiet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
         pthread_mutex_lock(&timerMut);
-        timer = std::max(timer, pakiet.ts) + 1;
+        timer = std::max(timer, pakiet.timestamp) + 1;
         pthread_mutex_unlock(&timerMut);
 
         switch ( status.MPI_TAG ) {
@@ -21,14 +23,14 @@ void *startKomWatek(void *ptr) {
                 break;
                 }
             case ACK: {
-                printf("%d Dostałem ACK od %d z zegarem:%d \n",rank_comm, pakiet.src_id, pakiet.ts);
+                printf("%d Dostałem ACK od %d z zegarem:%d \n",rank_comm, pakiet.src_id, pakiet.timestamp);
                 ACK_got++;
                 if (ACK_got == num_otaku) try_to_enter();                //kiedy otrzymałam wszystkie ACK wtedy probuje wejść
                 break;
                 }
             case REQUEST: {
-                printf("%d Dostałem REQUEST od %d z zegarem:%d i cuchami:%d \n",rank_comm, pakiet.src_id, pakiet.ts, pakiet.cuchy);
-                add_by_time(queue, pakiet.ts, pakiet.src_id, pakiet.cuchy);  //dodajemy element do kolejki według znacznika czasowego
+                printf("%d Dostałem REQUEST od %d z zegarem:%d i cuchami:%d \n",rank_comm, pakiet.src_id, pakiet.timestamp, pakiet.cuchy);
+                add_by_time(queue, pakiet.timestamp, pakiet.src_id, pakiet.cuchy);  //dodajemy element do kolejki według znacznika czasowego
                 print_queue(queue);  //wypisujemy kolejke
 
                 pthread_mutex_lock(&timerMut);
@@ -43,7 +45,7 @@ void *startKomWatek(void *ptr) {
                 }
             case RELEASE: {
                 int del_src = pakiet.src_id;                //zapisujemy do zmiennej id otaku bo nie jest już w kolejce i mysimy go usunąć
-                printf("%d Dostałem RELEASE od %d  %dz zegarem:%d \n",rank_comm, pakiet.src_id, del_src, pakiet.ts);
+                printf("%d Dostałem RELEASE od %d  %dz zegarem:%d \n",rank_comm, pakiet.src_id, del_src, pakiet.timestamp);
                 int pos = find_by_src(queue, del_src);          //znachodzimy pozycju w kolejce otaku którego chcemy usunąć
                 if (ptn_num_w_kolejce_policzony < pos) {        //sprawdzamy czy X jest przekroczony
                     update_cuchy(pos);

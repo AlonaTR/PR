@@ -1,5 +1,6 @@
 #include "main.hpp"
 #include "watek_glowny.hpp"
+#include "const.hpp"
 
 
 void mainLoop() {

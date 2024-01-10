@@ -29,6 +29,7 @@ int timer = 0;
 MPI_Datatype MPI_PAKIET_T;
 pthread_t threadKom;
 
+
 pthread_mutex_t stateMut = PTHREAD_MUTEX_INITIALIZER;      // wchodzimy gdy zminiamy stan
 pthread_mutex_t timerMut = PTHREAD_MUTEX_INITIALIZER;    //sekcja krytyczna zegara
 pthread_mutex_t roomMut = PTHREAD_MUTEX_INITIALIZER;        //sekcja krytyczna stanowiska w pokoju
@@ -98,7 +99,7 @@ void init_MPI(int argc, char** argv) {
     MPI_Datatype typy[FIELDNO] = {MPI_INT, MPI_INT, MPI_INT};
 
     MPI_Aint     offsets[FIELDNO]; 
-    offsets[0] = offsetof(packet_t, ts);
+    offsets[0] = offsetof(packet_t, timestamp);
     offsets[1] = offsetof(packet_t, src_id);
     offsets[2] = offsetof(packet_t, cuchy);
 
@@ -136,7 +137,7 @@ void send_packet(packet_t *packet, int destination, int tag) {
     }
 
     // timer++;
-    packet->ts = timer;
+    packet->timestamp = timer;
     packet->cuchy = my_cuchy;
     packet->src_id = rank_comm;
     MPI_Send(packet, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
