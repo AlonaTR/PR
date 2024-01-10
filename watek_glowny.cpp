@@ -15,7 +15,7 @@ void mainLoop() {
                     if (my_cuchy > M) {                         //Jesli cuchy Otaku większe za M, to oznacza że on nigdy nie zmoże wejść do pokoju
                         if(!printed) {
                             printed = true;
-                            debug("Koniec przetwarzania (M:%d, moje_cuchy: %d)", M, my_cuchy);
+                            printf("%d Koniec przetwarzania (M:%d, moje_cuchy: %d) \n",rank_comm, M, my_cuchy);
                         }
                         continue;
                     }
@@ -23,7 +23,7 @@ void mainLoop() {
                     change_state( InQueue );
                     
                     pthread_mutex_lock( &timerMut );
-                    debug("Zmieniam stan na \"Ubiegam się\"");
+                    printf("%d Zmieniam stan na \"Ubiegam się\" \n", rank_comm);
                     timer++;
                     for (int i=0; i<size_comm; i++){
                         send_packet(0, i, REQUEST);
@@ -33,17 +33,17 @@ void mainLoop() {
                     break;
                 case InQueue:
                 /* czekanie na wejście do pokoju (mutex w wątku komunikacyjnym) */
-                    debug("Czekam na wejście do pokoju");
+                    printf("%d Czekam na wejście do pokoju \n", rank_comm);
                     pthread_mutex_lock( &roomMut );       
                     pthread_mutex_lock( &leaveRoomMut );                                                //czy można to zabrać?
                     change_state( InRoom );
-                    debug("Zmieniam stan na \"Jestem w pokoju\"");                                      //przeniść do stanu pokój??
+                    printf("%d Zmieniam stan na \"Jestem w pokoju\" \n", rank_comm);                                      //przeniść do stanu pokój??
                     
                     break;
                 case InRoom:
                 /*jestem w pokoju */
                     sleep(rand()% MAX_SEC_IN_ROOM + 1); //spędza czas w pokoju
-                    debug("Chcę wyjść z pokoju");
+                    printf("%d Chcę wyjść z pokoju \n", rank_comm);
                     pthread_mutex_lock(&timerMut);
                     timer++;
                     for (int i=0; i<size_comm; i++) send_packet(0, i, RELEASE);  //wysyłamy komunikat że wychodzimy z pokoju
@@ -55,7 +55,7 @@ void mainLoop() {
                     // TODO: send ACK to everyone in queue
 
                     ACK_got = 0;
-                    println("Wyszedłem z pokoju");
+                    printf("%d Wyszedłem z pokoju \n", rank_comm);
                     printed = false;
                     break;
                 default:

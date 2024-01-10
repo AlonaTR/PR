@@ -1,4 +1,5 @@
 #include "main.hpp"
+#include "const.hpp"
 #include "watek_glowny.hpp"
 #include "watek_komunikacyjny.hpp"
 
@@ -63,7 +64,7 @@ void init_program_vars(int argc, char** argv) {
     queue = create_queue();
 
     pthread_create(&threadKom, nullptr, startKomWatek, 0);
-    debug("jestem");
+    printf("%d jestem \n", rank_comm);
 }
 
 
@@ -113,7 +114,7 @@ void init_MPI(int argc, char** argv) {
 
 void finalize() {
     /* Czekamy, aż wątek potomny się zakończy */
-    println("czekam na wątek \"komunikacyjny\"\n" );
+    printf("%d czekam na wątek \"komunikacyjny\"\n", rank_comm );
     pthread_join(threadKom,NULL);
     if (rank_comm == 0) pthread_join(threadKom, NULL);
     pthread_mutex_destroy( &stateMut);
@@ -142,16 +143,16 @@ void send_packet(packet_t *packet, int destination, int tag) {
 
     switch(tag) {
         case REQUEST:
-        debug("Wysłano REQUEST do %d z cuchami %d", destination, packet->cuchy);
+        printf("%d Wysłano REQUEST do %d z cuchami %d \n",rank_comm, destination, packet->cuchy);
             break;
         case RELEASE:
-            debug("Wysłano RELEASE do %d", destination);
+            printf("%d Wysłano RELEASE do %d \n",rank_comm, destination);
             break;
         case ACK:
-            debug("Wysłano ACK do %d", destination);
+            printf("%d Wysłano ACK do %d \n",rank_comm, destination);
             break;
         default:
-            debug("Packet sent to %d, unknown tag", destination);
+            printf("%d Packet sent to %d, unknown tag \n",rank_comm, destination);
             break;
     }
     if (packet_created) delete packet;
