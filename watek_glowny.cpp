@@ -6,7 +6,7 @@
 void mainLoop() {
     bool printed = false;
     srand(time(NULL) + rank_comm);
-    while (stan != InFinish) {                  //dopóki nie jest w stanie InFinish
+    while (true) {                  //dopóki nie jest w stanie InFinish
         int perc = rand() % 100; 
         // try to enter with some probability
         if (perc < STATE_CHANGE_PROB) {      //STATE_CHANGE_PROB determinuje jak często i na jak długo zmieniają się stany
@@ -17,6 +17,7 @@ void mainLoop() {
                         if(!printed) {
                             printed = true;
                             printf("%d Koniec przetwarzania (M:%d, moje_cuchy: %d) \n",rank_comm, M, my_cuchy);
+                            
                         }
                         continue;
                     }
@@ -71,4 +72,5 @@ void mainLoop() {
             sleep(random() % MAX_SEC_IN_ROOM + 1);
         }
     }
+
 }

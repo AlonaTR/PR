@@ -27,7 +27,7 @@ extern int ptn_num_w_kolejce_policzony;    /* wskaźnik-pozycja na której zoko�
 
 extern struct Queue *queue;
 
-typedef enum {InLobby, InQueue, InRoom, InFinish} state_t;
+typedef enum {InLobby, InQueue, InRoom} state_t;
 /* programme part */
 extern state_t stan;
 extern int size_comm;

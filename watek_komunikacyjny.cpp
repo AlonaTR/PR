@@ -9,7 +9,7 @@ void *startKomWatek(void *ptr) {
     bool is_message = false;
     packet_t pakiet;
     /* Obrazuje pętlę odbierającą pakiety o różnych typach */
-    while ( stan!=InFinish ) {
+    while ( true) {
 	    printf("%d czekam na recv \n", rank_comm);
         MPI_Recv( &pakiet, 1, MPI_PAKIET_T, MPI_ANY_SOURCE, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
 
@@ -18,10 +18,7 @@ void *startKomWatek(void *ptr) {
         pthread_mutex_unlock(&timerMut);
 
         switch ( status.MPI_TAG ) {
-            case FINISH: {
-                change_state(InFinish);
-                break;
-                }
+            
             case ACK: {
                 printf("%d Dostałem ACK od %d z zegarem:%d \n",rank_comm, pakiet.src_id, pakiet.timestamp);
                 ACK_got++;

@@ -1,5 +1,4 @@
 /* Typy wiadomości */
-#define FINISH 1
 #define REQUEST 2
 #define RELEASE 3
 #define ACK 4

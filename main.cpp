@@ -162,6 +162,6 @@ void send_packet(packet_t *packet, int destination, int tag) {
 
 void change_state(state_t newState) {
     pthread_mutex_lock(&stateMut);
-    if (stan!=InFinish) stan = newState;
+    stan = newState;
     pthread_mutex_unlock(&stateMut);
 }
