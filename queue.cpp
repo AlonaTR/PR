@@ -2,7 +2,6 @@
 #include "main.hpp"
 
 struct Queue* create_queue() {
-    // struct Queue *queue = (struct Queue*)malloc(sizeof(struct Queue));
     struct Queue *queue = new Queue();
     queue->size = 0;
     return queue;
@@ -36,7 +35,7 @@ struct part* create_part(int ts, int src_id, int cuchy) {
 }
 
 void add_by_time(struct Queue *queue, int ts, int src_id, int cuchy) {
-    struct part *new_element = create_part(ts, src_id, cuchy);
+    struct part *new_element = create_part(ts, src_id, cuchy);  //dane o oTAku od którego otrzymaliśmy
 
     // jeśli kolejka jest pusta ustaw element jako nowy 
     if (is_empty(queue)) {
@@ -47,23 +46,26 @@ void add_by_time(struct Queue *queue, int ts, int src_id, int cuchy) {
 
     //znajdź element z większą etykietą czasową (zapis pod head)
     struct part *head = queue->head;
-    while ((head->next) && (head->ts < new_element->ts || ((head->ts == new_element->ts) && (head->src_id < new_element->src_id)))) {
+    while ((head->next) && (head->ts < new_element->ts || ((head->ts == new_element->ts) && (head->src_id < new_element->src_id)))) { //przesuwamy nowy element wkolejce do przodu dopóki on ma wjększą wartość zegara od pozostałch
         head = head->next;
     }
 
     // nie znaloziono z większym znacznikiem - wstaw na koniec
     if ((head->ts < new_element->ts) || (head->ts == new_element->ts && head->src_id < new_element->src_id)) {
-        head->next = new_element;
-        new_element->prev = head;
+        head->next = new_element; //nastepny element będę dla nas head
+        new_element->prev = head; // a my dla niego prev
     } else {
     // znaleniono większy znacznik czasowy
-        new_element->next = head;
+        new_element->next = head;  //dla nas najwjększy element jest następnikiem
+
         // head nie na początku queue
         if (head->prev) {
-            head->prev->next = new_element;
+            head->prev->next = new_element;  // ustałamy dla poprzednika najwjększego elementu wskażnik na nas, że teraz będziemy dla niego next
         } else {
-            queue->head = new_element;
-        } head->prev = new_element;
+            queue->head = new_element;      //jeśli nie istnieje poprzednika najwiekszego to stajemy na koniec kolejki
+        } 
+         
+        head->prev = new_element;  //jesteśmy poprzednim elementem dla najwjększego
     }
     queue->size++;
     return;

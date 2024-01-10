@@ -23,40 +23,40 @@ void *startKomWatek(void *ptr) {
             case ACK: {
                 debug("Dostałem ACK od %d z zegarem:%d", pakiet.src_id, pakiet.ts);
                 ACK_got++;
-                if (ACK_got == num_otaku) try_to_enter();
+                if (ACK_got == num_otaku) try_to_enter();                //kiedy otrzymałam wszystkie ACK wtedy probuje wejść
                 break;
                 }
             case REQUEST: {
                 debug("Dostałem REQUEST od %d z zegarem:%d i cuchami:%d", pakiet.src_id, pakiet.ts, pakiet.cuchy);
-                add_by_time(queue, pakiet.ts, pakiet.src_id, pakiet.cuchy);
-                print_queue(queue);
+                add_by_time(queue, pakiet.ts, pakiet.src_id, pakiet.cuchy);  //dodajemy element do kolejki według znacznika czasowego
+                print_queue(queue);  //wypisujemy kolejke
 
                 pthread_mutex_lock(&timerMut);
                 timer++;
-                send_packet(0, pakiet.src_id, ACK);
+                send_packet(0, pakiet.src_id, ACK);  //wysyłamy potwierdzenie
                 pthread_mutex_unlock(&timerMut);
 
-                if(pakiet.src_id == rank_comm) {
+                if(pakiet.src_id == rank_comm) {                                                            // nie rozumiem po co to jest
                     ubiegam_sie = true;
                 }
                 break;
                 }
             case RELEASE: {
-                int del_src = pakiet.src_id;
+                int del_src = pakiet.src_id;                //zapisujemy do zmiennej id otaku bo nie jest już w kolejce i mysimy go usunąć
                 debug("Dostałem RELEASE od %d  %dz zegarem:%d", pakiet.src_id, del_src, pakiet.ts);
-                int pos = find_by_src(queue, del_src);
-                if (ptn_num_w_kolejce_policzony < pos) {
+                int pos = find_by_src(queue, del_src);          //znachodzimy pozycju w kolejce otaku którego chcemy usunąć
+                if (ptn_num_w_kolejce_policzony < pos) {        //sprawdzamy czy X jest przekroczony
                     update_cuchy(pos);
                 }
-                pop_by_src(queue, pakiet.src_id);
+                pop_by_src(queue, pakiet.src_id);       //usuwamy z kolejki
                 print_queue(queue);
                 ptn_num_w_kolejce_policzony--;
-                if (ptn_num_w_kolejce_policzony == -1) wyzerowanie_kolejki = false;
+                if (ptn_num_w_kolejce_policzony == -1) wyzerowanie_kolejki = false;    
 
-                if (ubiegam_sie) try_to_enter();
-                else if (pakiet.src_id == rank_comm) {
+                if (ubiegam_sie) try_to_enter();        //probujemy wejść do pokoju
+                else if (pakiet.src_id == rank_comm) {  //jeśli otrzymaliśmy REALESE od siebie, to zwjększmy cuchy
                     // srand(rank_comm);
-                    my_cuchy = rand() % M + 1;
+                    my_cuchy = my_cuchy + rand() % M + 1;
                     pthread_mutex_unlock(&leaveRoomMut);
                 }
                 break;
@@ -78,7 +78,7 @@ void try_to_enter() {
     } else debug("1. Otrzymano wszystkie ACK: TAK");
 
     // istnieje wolne stanowisko
-    int moj_idx = find_by_rank(queue);
+    int moj_idx = find_by_rank(queue);   
     if (moj_idx+1 > shower_stand_num) {
         debug("2. Jest miejsce (S:%d, ja:%d): NIE", shower_stand_num, moj_idx + 1);
         println("---NIE ZEZWOLONO NA DOSTĘP---");
@@ -87,10 +87,10 @@ void try_to_enter() {
     
     // my_cychy mieszczą się w limicie M
     int suma_cuchow = 0;
-    for (int i = 0; i <= moj_idx; i++) {
+    for (int i = 0; i <= moj_idx; i++) {     //sumujemy cuchy wszystkich kto stoi przed nami w kolejce + siebie
         struct part* element = get_by_id(queue, i);
         suma_cuchow += element->cuchy;
-        if (suma_cuchow > M) {
+        if (suma_cuchow > M) {             
             debug("3. Cuchy w pomieszczeniu przekroczone (M:%d, aktualne:%d): NIE", M, suma_cuchow);
             println("---NIE ZEZWOLONO NA DOSTĘP---");
             return;
@@ -106,7 +106,7 @@ void try_to_enter() {
             return;
         } else debug("4. Wyzerowano kolejkę: TAK");
     } else if (! counted_X) {
-        update_cuchy(find_by_rank(queue));
+        update_cuchy(find_by_rank(queue));                  //tu bieżemy tylko jeden pierwszy element w kolejce, a potrzedujemy wziąć wszystkich poprzedników jeśli liczba stanowisk zezwała na wejscie tych osób + mnie
         if (wyzerowanie_kolejki) {
             if (ptn_num_w_kolejce_policzony > -1) {
                 debug("4. Wyzerowano kolejkę: NIE");

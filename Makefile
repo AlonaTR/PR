@@ -15,7 +15,7 @@ main: $(SOURCES) $(HEADERS)
 clear: clean
 
 clean:
-	rm main a.out
+	rm main 
 
 run: main
 	mpirun -n $(N) ./main $(stanowiska) $(M) $(X)

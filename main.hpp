@@ -86,11 +86,9 @@ extern MPI_Datatype MPI_PAKIET_T;
                                                 ...  w definicji makra oznacza, że ma zmienną liczbę parametrów
                                             
 */
-#ifdef DEBUG
+
 #define debug(FORMAT,...) printf("%c[%d;%dm [%d]: %d " FORMAT "%c[%d;%dm\n",  27, (1+(rank_comm/7))%2, 31+(6+rank_comm)%7, rank_comm, timer, ##__VA_ARGS__, 27,0,37);
-#else
-#define debug(...) ;
-#endif
+
 
 #define P_WHITE printf("%c[%d;%dm",27,1,37);
 #define P_BLACK printf("%c[%d;%dm",27,1,30);
