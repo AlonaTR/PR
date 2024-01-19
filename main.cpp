@@ -1,7 +1,7 @@
 #include "main.hpp"
 #include "const.hpp"
-#include "watek_glowny.hpp"
-#include "watek_komunikacyjny.hpp"
+#include "main_thread.hpp"
+#include "comm_thread.hpp"
 
 using namespace std;
 
@@ -14,17 +14,15 @@ int current_x = 0;
 int ACK_got = 0;
 
 
-bool ubiegam_sie = false;
-bool wyzerowanie_kolejki = false;
-bool counted_X = false;
-int ptn_num_w_kolejce_policzony = -1;
+bool waiting_for_entry = false;
+int lastProcessedPositionInQueue = -1;
 
 struct Queue *queue;
 
 /* programme part */
 state_t stan = InLobby;
-int size_comm = 0;               //ilość otaku
-int rank_comm =0;                //indeks MPI otaku
+int size_comm = 0;               //ilość procesów
+int rank_comm =0;                //numer identyfikacyjny procesu 
 int timer = 0;   
 MPI_Datatype MPI_PAKIET_T;
 pthread_t threadKom;
@@ -72,7 +70,7 @@ void init_program_vars(int argc, char** argv) {
 void init_MPI(int argc, char** argv) {
     int provided;
     // MPI_THREAD_MULTIPLE - Multiple threads may call MPI, with no restrictions. 
-    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided);
+    MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided); //Zmienna provided będzie przechowywać informacje o dostarczonym poziomie obsługi wątków.
 
     /*  check thread support */
     cout << "THREAD SUPPORT: chcemy " << MPI_THREAD_MULTIPLE << ". Co otrzymamy?\n";
@@ -89,12 +87,8 @@ void init_MPI(int argc, char** argv) {
         exit(-1);
     }
 
-    /* Stworzenie typu */
-    /* Poniższe (aż do MPI_Type_commit) potrzebne tylko, jeżeli
-       brzydzimy się czymś w rodzaju MPI_Send(&typ, sizeof(pakiet_t), MPI_BYTE....
-    */
-    /* sklejone z stackoverflow */
-    const int nitems=FIELDNO; /* bo packet_t ma FIELDNO pól */
+
+    const int nitems=FIELDNO; 
     int       blocklengths[FIELDNO] = {1,1,1};
     MPI_Datatype typy[FIELDNO] = {MPI_INT, MPI_INT, MPI_INT};
 
@@ -109,14 +103,13 @@ void init_MPI(int argc, char** argv) {
 
     MPI_Comm_size(MPI_COMM_WORLD, &size_comm);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank_comm);
-    //cout << "Our print : " << size_comm << rank_comm << "\n";
 }
 
 
 void finalize() {
     /* Czekamy, aż wątek potomny się zakończy */
     printf("%d czekam na wątek \"komunikacyjny\"\n", rank_comm );
-    pthread_join(threadKom,NULL);
+    pthread_join(threadKom,NULL); //oczekujemy na zakoczenie wątku komunikacyjnego
     if (rank_comm == 0) pthread_join(threadKom, NULL);
     pthread_mutex_destroy( &stateMut);
     pthread_mutex_destroy( &timerMut);
@@ -132,11 +125,10 @@ void send_packet(packet_t *packet, int destination, int tag) {
     bool packet_created = false;
     
     if (packet == 0) {
-        packet = new packet_t();                                        //czy można usunąć? tutaj sprawdzamy czy pakey jest pusty
+        packet = new packet_t();                                       
         packet_created = true;
     }
 
-    // timer++;
     packet->timestamp = timer;
     packet->cuchy = my_cuchy;
     packet->src_id = rank_comm;

@@ -6,6 +6,6 @@ void *startKomWatek(void *ptr);
 // sprawdzenie mozliwosci wejscia do pokoju
 void try_to_enter();
 // update aktualną liczbę cuchów z kolejki
-void update_cuchy(int pos);
+void update_cuchy_X(int pos);
 
 #endif

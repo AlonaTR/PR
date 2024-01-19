@@ -90,23 +90,6 @@ int find_by_src(struct Queue *queue, int source) {
     return i;
 }
 
-int find_by_rank(struct Queue *queue) {
-    struct part *head = queue->head;
-    if (is_empty(queue)) {
-        printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, rank_comm);
-        exit(-1);
-    }
-    int i = 0;
-    while ((head->next) && (head->src_id != rank_comm)) {
-        head = head->next;
-        i++;
-    }
-    if (head->src_id != rank_comm) {
-        printf("%d !!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!! \n",rank_comm, rank_comm);
-        exit(-1);
-    }
-    return i;
-}
 
 void pop_by_src(struct Queue *queue, int src_id) {
     if(is_empty(queue)) {

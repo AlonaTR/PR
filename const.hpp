@@ -10,6 +10,6 @@
 #define MAX_SEC_IN_ROOM 7
 #define MAX_CUCH_INCREASE 5
 
-#define FIELDNO 3
+#define FIELDNO 3 // ilość pól które ma packet_t 
 
 
