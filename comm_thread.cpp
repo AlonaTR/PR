@@ -43,19 +43,18 @@ void *startKomWatek(void *ptr) {
             case RELEASE: {
                 int del_src = pakiet.src_id;                //zapisujemy do zmiennej id otaku bo nie jest już w kolejce i mysimy go usunąć
                 printf("%d Dostałem RELEASE od %d  %dz zegarem:%d \n",rank_comm, pakiet.src_id, del_src, pakiet.timestamp);
-                int pos = find_by_src(queue, del_src);          //znachodzimy pozycju w kolejce otaku którego chcemy usunąć
+                int pos = find_pos_by_id(queue, del_src);          //znachodzimy pozycju w kolejce otaku którego chcemy usunąć
                 if (lastProcessedPositionInQueue < pos) {        //jeśli go uaktualizujemy go cuchy
                     update_cuchy_X(pos);
                 }
 
-                pop_by_src(queue, pakiet.src_id);       //usuwamy z kolejki
+                pop_by_id(queue, pakiet.src_id);       //usuwamy z kolejki
                 print_queue(queue);
                 lastProcessedPositionInQueue--;
                   
 
                 if (waiting_for_entry) try_to_enter();        //probujemy wejść do pokoju
                 else if (pakiet.src_id == rank_comm) {  //jeśli otrzymaliśmy REALESE od siebie, to zwjększmy cuchy
-                    // srand(rank_comm);
                     my_cuchy = my_cuchy + rand() % MAX_CUCH_INCREASE + 1;
                     pthread_mutex_unlock(&leaveRoomMut);
                 }
@@ -78,8 +77,7 @@ void try_to_enter() {
     } else printf("%d 1. Otrzymano wszystkie ACK: TAK \n", rank_comm);
 
     // istnieje wolne stanowisko
-    //int moj_idx = find_pos_in_queue(queue);   
-    int moj_idx = find_by_src(queue, rank_comm);  
+    int moj_idx = find_pos_by_id(queue, rank_comm);  
     if (moj_idx+1 > shower_stand_num) {
         printf("%d 2. Jest miejsce (S:%d, ja:%d): NIE \n",rank_comm, shower_stand_num, moj_idx + 1);
         printf("%d ---NIE ZEZWOLONO NA DOSTĘP--- \n", rank_comm);
@@ -89,7 +87,7 @@ void try_to_enter() {
     // my_cychy mieszczą się w limicie M
     int suma_cuchow = 0;
     for (int i = 0; i <= moj_idx; i++) {     //sumujemy cuchy wszystkich kto stoi przed nami w kolejce + siebie
-        struct part* element = get_by_id(queue, i);
+        struct part* element = get_info_by_pos(queue, i);
         suma_cuchow += element->cuchy;
         if (suma_cuchow > M) {             
             printf("%d 3. Cuchy w pomieszczeniu przekroczone (M:%d, aktualne:%d): NIE \n",rank_comm, M, suma_cuchow);
@@ -99,7 +97,7 @@ void try_to_enter() {
     } 
     printf("%d 3. Moje cuchy mieszczą się w pokoju (M:%d, aktualne:%d): TAK \n",rank_comm, M, suma_cuchow);
     
-    update_cuchy_X(find_by_src(queue, rank_comm)); 
+    update_cuchy_X(find_pos_by_id(queue, rank_comm)); 
 
     printf("%d --- ZEZWOLONO NA DOSTĘP --- \n", rank_comm);
     ACK_got = 0;
@@ -110,7 +108,7 @@ void try_to_enter() {
 void update_cuchy_X(int pos) {
     while(lastProcessedPositionInQueue < pos) {
         lastProcessedPositionInQueue++;
-        struct part *request = get_by_id(queue, lastProcessedPositionInQueue);
+        struct part *request = get_info_by_pos(queue, lastProcessedPositionInQueue);
         current_x += request->cuchy;
         if(current_x >= X) {
             printf("%d !!! PROCES %d PRZEPEŁNIŁ X (X:%d, aktualny_X:%d): zerowanie X \n",rank_comm, request->src_id, X, current_x);
