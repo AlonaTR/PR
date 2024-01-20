@@ -25,9 +25,9 @@ void mainLoop() {
                     change_state( InQueue );
                     
                     pthread_mutex_lock( &timerMut );
-                    printf("%d Zmieniam stan na \"Ubiegam się\" \n", rank_comm);
+                    printf("%d Zmieniam stan na \"Kolejka\" \n", rank_comm);
                     timer++;
-                    /* wyślij REQUEST o wejście do pokoju */
+                    
                     for (int i=0; i<size_comm; i++){
                         send_packet(0, i, REQUEST);
                     }
@@ -56,7 +56,7 @@ void mainLoop() {
                     change_state(InLobby);
 
                     ACK_got = 0;
-                    printf("%d Wyszedłem z pokoju \n", rank_comm);
+                    printf("%d Zmieniam stan na \"Korytarz\" \n", rank_comm);
                     printed = false;
                     break;
                 default:
@@ -67,9 +67,6 @@ void mainLoop() {
         if (stan == InLobby) {
             sleep(random() % MAX_SEC_IN_LOBBY + 1);
         } 
-        else if (stan == InRoom) {
-            sleep(random() % MAX_SEC_IN_ROOM + 1);
-        }
     }
 
 }

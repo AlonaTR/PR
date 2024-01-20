@@ -6,7 +6,6 @@
 
 void *startKomWatek(void *ptr) {
     MPI_Status status;
-    bool is_message = false;
     packet_t pakiet;
     /* Obrazuje pętlę odbierającą pakiety o różnych typach */
     while ( true) {

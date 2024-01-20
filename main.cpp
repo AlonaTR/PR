@@ -58,7 +58,6 @@ void init_program_vars(int argc, char** argv) {
 
     num_otaku = size_comm; 
     srand (rank_comm);
-    // in range 1 to X
     my_cuchy = rand() % M + 1;
     queue = create_queue();
 
