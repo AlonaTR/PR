@@ -26,11 +26,10 @@ struct part* create_part(int timestamp, int src_id, int cuchy);
 // dodaje element według etykiety czasowej, sort(timestamp, id)
 void add_by_time(struct Queue *queue, int timestamp, int src_id, int cuchy);
 // zwraca indeks elemntu w kolejce według id procesu
-int find_by_src(struct Queue *queue, int dupa);
-int find_by_rank(struct Queue *queue);
-// zdejmuje element według id procesu
-void pop_by_src(struct Queue *queue, int src_id);
+int find_pos_by_id(struct Queue *queue, int source);
+//szukamy swoją pozycje w kolejce
+void pop_by_id(struct Queue *queue, int src_id);
 // zwraca wybrany element w kolejce według pozycji
-struct part* get_by_id(struct Queue *queue, int idx);
+struct part* get_info_by_pos(struct Queue *queue, int idx);
 
 #endif

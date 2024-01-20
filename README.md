@@ -1,2 +1,1 @@
-# Otaku
-Distributed system university project
+study projekt

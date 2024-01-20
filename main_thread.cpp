@@ -1,18 +1,18 @@
 #include "main.hpp"
-#include "watek_glowny.hpp"
+#include "main_thread.hpp"
 #include "const.hpp"
 
 
 void mainLoop() {
     bool printed = false;
     srand(time(NULL) + rank_comm);
-    while (true) {                  //dopóki nie jest w stanie InFinish
+    while (true) {               
         int perc = rand() % 100; 
-        // try to enter with some probability
+        // spróbuj wejść z pewnym prawdopodobieństwem
         if (perc < STATE_CHANGE_PROB) {      //STATE_CHANGE_PROB determinuje jak często i na jak długo zmieniają się stany
             switch(stan) {
                 case InLobby:
-                /* wyślij REQUEST o wejście do pokoju */
+                
                     if (my_cuchy > M) {                         //Jesli cuchy Otaku większe za M, to oznacza że on nigdy nie zmoże wejść do pokoju
                         if(!printed) {
                             printed = true;
@@ -25,8 +25,9 @@ void mainLoop() {
                     change_state( InQueue );
                     
                     pthread_mutex_lock( &timerMut );
-                    printf("%d Zmieniam stan na \"Ubiegam się\" \n", rank_comm);
+                    printf("%d Zmieniam stan na \"Kolejka\" \n", rank_comm);
                     timer++;
+                    
                     for (int i=0; i<size_comm; i++){
                         send_packet(0, i, REQUEST);
                     }
@@ -35,17 +36,17 @@ void mainLoop() {
                     break;
                 case InQueue:
                 /* czekanie na wejście do pokoju (mutex w wątku komunikacyjnym) */
-                    printf("%d Czekam na wejście do pokoju \n", rank_comm);
+                    //printf("%d Czekam na wejście do pokoju \n", rank_comm);
                     pthread_mutex_lock( &roomMut );       
-                    pthread_mutex_lock( &leaveRoomMut );                                                //czy można to zabrać?
+                    pthread_mutex_lock( &leaveRoomMut );                                                
                     change_state( InRoom );
-                    printf("%d Zmieniam stan na \"Jestem w pokoju\" \n", rank_comm);                                      //przeniść do stanu pokój??
+                    printf("%d Zmieniam stan na \"Jestem w pokoju\" \n", rank_comm);                                  
                     
                     break;
                 case InRoom:
                 /*jestem w pokoju */
                     sleep(rand()% MAX_SEC_IN_ROOM + 1); //spędza czas w pokoju
-                    printf("%d Chcę wyjść z pokoju \n", rank_comm);
+                    //printf("%d Chcę wyjść z pokoju \n", rank_comm);
                     pthread_mutex_lock(&timerMut);
                     timer++;
                     for (int i=0; i<size_comm; i++) send_packet(0, i, RELEASE);  //wysyłamy komunikat że wychodzimy z pokoju
@@ -54,10 +55,8 @@ void mainLoop() {
                     pthread_mutex_lock(&leaveRoomMut);
                     change_state(InLobby);
 
-                    // TODO: send ACK to everyone in queue
-
                     ACK_got = 0;
-                    printf("%d Wyszedłem z pokoju \n", rank_comm);
+                    printf("%d Zmieniam stan na \"Korytarz\" \n", rank_comm);
                     printed = false;
                     break;
                 default:
@@ -68,9 +67,6 @@ void mainLoop() {
         if (stan == InLobby) {
             sleep(random() % MAX_SEC_IN_LOBBY + 1);
         } 
-        else if (stan == InRoom) {
-            sleep(random() % MAX_SEC_IN_ROOM + 1);
-        }
     }
 
 }

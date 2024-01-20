@@ -19,11 +19,9 @@ extern int my_cuchy;    /* moja wartość cuchów */
 extern int current_x;   /* aktualna ilosc cuchow*/
 extern int ACK_got;    /* liczba ACk otrzymana od innych procesów */
 
-extern bool ubiegam_sie; /* czy chcę dostępu do kolejki */
-extern bool wyzerowanie_kolejki;    /* czy opróżnienić kolejke */
-extern bool counted_X; /* czy limit cuchów uaktualniony */
+extern bool waiting_for_entry; /* czy chcę dostępu do kolejki */
 
-extern int ptn_num_w_kolejce_policzony;    /* wskaźnik-pozycja na której zokończono liczenie cuchó */
+extern int lastProcessedPositionInQueue;    /* wskaźnik-pozycja na której zokończono liczenie cuchó */
 
 extern struct Queue *queue;
 
@@ -43,8 +41,8 @@ extern pthread_mutex_t leaveRoomMut;
 
 
 typedef struct {
-    int timestamp;       //timestamp (zegar lamporta 
-    int src_id;      // pole nie przesyłane, ale ustawiane w main_loop 
+    int timestamp;       //timestamp (zegar lamporta )
+    int src_id;      
     int cuchy;      // wartość własna cuchów
 } packet_t;
 extern MPI_Datatype MPI_PAKIET_T;

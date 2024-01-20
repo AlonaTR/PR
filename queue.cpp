@@ -71,8 +71,8 @@ void add_by_time(struct Queue *queue, int timestamp, int src_id, int cuchy) {
     return;
 }
 
-int find_by_src(struct Queue *queue, int source) {
-    printf("%d find_by_src: %d \n",rank_comm, source);
+int find_pos_by_id(struct Queue *queue, int source) {
+    //printf("%d find_pos_by_id: %d \n",rank_comm, source);
     struct part *head = queue->head;
     if (is_empty(queue)) {
         printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, source);
@@ -90,25 +90,8 @@ int find_by_src(struct Queue *queue, int source) {
     return i;
 }
 
-int find_by_rank(struct Queue *queue) {
-    struct part *head = queue->head;
-    if (is_empty(queue)) {
-        printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, rank_comm);
-        exit(-1);
-    }
-    int i = 0;
-    while ((head->next) && (head->src_id != rank_comm)) {
-        head = head->next;
-        i++;
-    }
-    if (head->src_id != rank_comm) {
-        printf("%d !!! Próba pobrania id prcesu: %d, który nie istnieje w kolejce !!! \n",rank_comm, rank_comm);
-        exit(-1);
-    }
-    return i;
-}
 
-void pop_by_src(struct Queue *queue, int src_id) {
+void pop_by_id(struct Queue *queue, int src_id) {
     if(is_empty(queue)) {
         printf("%d !!! Próba pobrania żądanie według id procesu %d na pustej kolejce !!! \n",rank_comm, src_id);
         return;
@@ -131,7 +114,7 @@ void pop_by_src(struct Queue *queue, int src_id) {
     delete head;
 }
 
-struct part* get_by_id(struct Queue *queue, int id) {
+struct part* get_info_by_pos(struct Queue *queue, int id) {
     struct part *head = queue->head;
     if(is_empty(queue)) {
         printf("%d !!! Próba pobrania żądanie według pozycji %d na pustej kolejce !!! \n",rank_comm, id);
