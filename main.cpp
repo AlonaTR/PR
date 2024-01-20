@@ -30,7 +30,7 @@ pthread_t threadKom;
 
 pthread_mutex_t stateMut = PTHREAD_MUTEX_INITIALIZER;      // wchodzimy gdy zminiamy stan
 pthread_mutex_t timerMut = PTHREAD_MUTEX_INITIALIZER;    //sekcja krytyczna zegara
-pthread_mutex_t roomMut = PTHREAD_MUTEX_INITIALIZER;        //sekcja krytyczna stanowiska w pokoju
+pthread_mutex_t roomMut = PTHREAD_MUTEX_INITIALIZER;       
 pthread_mutex_t leaveRoomMut = PTHREAD_MUTEX_INITIALIZER;   //wchodzimy gdy chcemy wyjsć z pokoju
 
 
@@ -68,14 +68,13 @@ void init_program_vars(int argc, char** argv) {
 
 void init_MPI(int argc, char** argv) {
     int provided;
-    // MPI_THREAD_MULTIPLE - Multiple threads may call MPI, with no restrictions. 
     MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &provided); //Zmienna provided będzie przechowywać informacje o dostarczonym poziomie obsługi wątków.
 
     /*  check thread support */
-    cout << "THREAD SUPPORT: chcemy " << MPI_THREAD_MULTIPLE << ". Co otrzymamy?\n";
+    //cout << "THREAD SUPPORT: chcemy " << MPI_THREAD_MULTIPLE << ". Co otrzymamy?\n";
     if (provided == MPI_THREAD_MULTIPLE) {
         /* tego chcemy. Wszystkie inne powodują problemy */
-        cout << "Pełne wsparcie dla wątków\n"; 
+        //cout << "Pełne wsparcie dla wątków\n"; 
 
         
     } else {
@@ -107,7 +106,7 @@ void init_MPI(int argc, char** argv) {
 
 void finalize() {
     /* Czekamy, aż wątek potomny się zakończy */
-    printf("%d czekam na wątek \"komunikacyjny\"\n", rank_comm );
+    //printf("%d czekam na wątek \"komunikacyjny\"\n", rank_comm );
     pthread_join(threadKom,NULL); //oczekujemy na zakoczenie wątku komunikacyjnego
     if (rank_comm == 0) pthread_join(threadKom, NULL);
     pthread_mutex_destroy( &stateMut);
@@ -133,20 +132,20 @@ void send_packet(packet_t *packet, int destination, int tag) {
     packet->src_id = rank_comm;
     MPI_Send(packet, 1, MPI_PAKIET_T, destination, tag, MPI_COMM_WORLD);
 
-    switch(tag) {
-        case REQUEST:
-        printf("%d Wysłano REQUEST do %d z cuchami %d \n",rank_comm, destination, packet->cuchy);
-            break;
-        case RELEASE:
-            printf("%d Wysłano RELEASE do %d \n",rank_comm, destination);
-            break;
-        case ACK:
-            printf("%d Wysłano ACK do %d \n",rank_comm, destination);
-            break;
-        default:
-            printf("%d Packet sent to %d, unknown tag \n",rank_comm, destination);
-            break;
-    }
+    // switch(tag) {
+    //     case REQUEST:
+    //     printf("%d Wysłano REQUEST do %d z cuchami %d \n",rank_comm, destination, packet->cuchy);
+    //         break;
+    //     case RELEASE:
+    //         printf("%d Wysłano RELEASE do %d \n",rank_comm, destination);
+    //         break;
+    //     case ACK:
+    //         printf("%d Wysłano ACK do %d \n",rank_comm, destination);
+    //         break;
+    //     default:
+    //         printf("%d Packet sent to %d, unknown tag \n",rank_comm, destination);
+    //         break;
+    // }
     if (packet_created) delete packet;
 }
 

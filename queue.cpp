@@ -72,7 +72,7 @@ void add_by_time(struct Queue *queue, int timestamp, int src_id, int cuchy) {
 }
 
 int find_pos_by_id(struct Queue *queue, int source) {
-    printf("%d find_pos_by_id: %d \n",rank_comm, source);
+    //printf("%d find_pos_by_id: %d \n",rank_comm, source);
     struct part *head = queue->head;
     if (is_empty(queue)) {
         printf("%d !!! Próba pobrania pozycji żądania według id procesu %d na pustej kolejce !!! \n",rank_comm, source);

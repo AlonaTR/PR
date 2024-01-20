@@ -36,7 +36,7 @@ void mainLoop() {
                     break;
                 case InQueue:
                 /* czekanie na wejście do pokoju (mutex w wątku komunikacyjnym) */
-                    printf("%d Czekam na wejście do pokoju \n", rank_comm);
+                    //printf("%d Czekam na wejście do pokoju \n", rank_comm);
                     pthread_mutex_lock( &roomMut );       
                     pthread_mutex_lock( &leaveRoomMut );                                                
                     change_state( InRoom );
@@ -46,7 +46,7 @@ void mainLoop() {
                 case InRoom:
                 /*jestem w pokoju */
                     sleep(rand()% MAX_SEC_IN_ROOM + 1); //spędza czas w pokoju
-                    printf("%d Chcę wyjść z pokoju \n", rank_comm);
+                    //printf("%d Chcę wyjść z pokoju \n", rank_comm);
                     pthread_mutex_lock(&timerMut);
                     timer++;
                     for (int i=0; i<size_comm; i++) send_packet(0, i, RELEASE);  //wysyłamy komunikat że wychodzimy z pokoju
